@@ -1,0 +1,20 @@
+[project]
+name = "esp32-fw-hil"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Kacper Nowakowski",email = "knowakow@student.agh.edu.pl"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pyserial (>=3.5,<4.0)",
+    "matplotlib (>=3.10.8,<4.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "esp32_fw_hil", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
