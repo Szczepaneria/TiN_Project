@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+
+  # ── Desktop app unit tests ──────────────────────────────────────────────────
+  desktop-test:
+    name: Desktop — unit tests
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt6
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.7.3'
+          host: linux
+          target: desktop
+          cache: true
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y ninja-build libgl-dev
+
+      - name: Configure (tests only — SDL3 skipped)
+        run: |
+          cmake -S desktop_app -B build/desktop \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_APP=OFF
+
+      - name: Build
+        run: cmake --build build/desktop --target desktop_app_tests
+
+      - name: Test
+        run: ctest --test-dir build/desktop --output-on-failure
+
+
+  # ── ESP32 firmware build ────────────────────────────────────────────────────
+  esp32-build:
+    name: ESP32 — firmware build
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build with ESP-IDF
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v5.3.2
+          target: esp32
+          path: esp32_firmware
+          command: idf.py build
+
